@@ -16,21 +16,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager());
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        /*AUTOMATED ADDING TABS based on count of fragments in the adapter.
-        for (int i =0; i<=adapter.getCount()-1; i++)
-        {
-            tabLayout.addTab(tabLayout.newTab().setText(adapter.getPageTitle(i)));
-        }*/
-        //MANUALLY ADDING TABS
-        tabLayout.addTab(tabLayout.newTab().setText("Tab1"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab2"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab3"));
-
+        tabLayout.addTab(tabLayout.newTab().setText("Local"));
+        tabLayout.addTab(tabLayout.newTab().setText("Top rated"));
+        tabLayout.addTab(tabLayout.newTab().setText("All"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
+        final FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
