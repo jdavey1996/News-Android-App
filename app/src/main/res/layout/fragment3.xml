@@ -12,4 +12,10 @@
         android:textColor="#212121"
         android:background="#ffffff"
         android:padding="10dp"/>
+
+    <ListView
+        android:layout_width="332dp"
+        android:layout_height="493dp"
+        android:id="@+id/listView"
+        android:layout_gravity="center" />
 </FrameLayout>

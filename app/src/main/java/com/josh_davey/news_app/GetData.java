@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,13 +33,14 @@ public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
 
             URL url = new URL("http://josh-davey.com/news_app_data/news_articles.json");
 
+            //Gets the articles array stored within the downloaded json object.
             JSONArray array = returnJson(url).getJSONArray("articles");
 
+            //Loops through al objects within the articles array, adding them to an articles object, then the an ArrayList to be returned to the onPostExecute method.
             for (int i = 0; i < array.length(); i++) {
                 JSONObject temp = array.getJSONObject(i);
                 Article obj = new Article(temp.getString("number").toString(),temp.getString("title").toString(),temp.getString("desc").toString());
                 data.add(obj);
-
             }
 
             return data;
@@ -51,7 +54,11 @@ public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
 
     @Override
     protected void onPostExecute(ArrayList<Article> result) {
-        Log.i("onPostExec", result.get(0).getTitle());
+
+        //Uses a listadapter to set the data for the listview in fragment 3.
+        final ListAdapter adapter = new ArticleArrayAdapter(activity, result);
+        final ListView list = (ListView) activity.findViewById(R.id.listView);
+        list.setAdapter(adapter);
     }
 
     private JSONObject returnJson(URL url) {

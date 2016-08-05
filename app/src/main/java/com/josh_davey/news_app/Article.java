@@ -2,25 +2,25 @@ package com.josh_davey.news_app;
 
 public class Article {
     public String ArticleNum;
-    public String Title;
-    public String Desc;
+    public String ArticleTitle;
+    public String ArticleDesc;
 
     public Article(String ArticleNum, String Title, String Desc)
     {
         this.ArticleNum = ArticleNum;
-        this.Title = Title;
-        this.Desc = Desc;
+        this.ArticleTitle = Title;
+        this.ArticleDesc = Desc;
     }
 
     public String getArticleNum() {
         return ArticleNum;
     }
 
-    public String getDesc() {
-        return Desc;
+    public String getArticleDesc() {
+        return ArticleDesc;
     }
 
-    public String getTitle() {
-        return Title;
+    public String getArticleTitle() {
+        return ArticleTitle;
     }
 }
