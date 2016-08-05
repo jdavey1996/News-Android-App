@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GetData extends AsyncTask<String, String,String>{
+public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
     Context ctx;
     Activity activity;
 
@@ -25,18 +25,22 @@ public class GetData extends AsyncTask<String, String,String>{
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected ArrayList<Article> doInBackground(String... params) {
         try {
+            ArrayList<Article> data = new ArrayList<Article>();
+
             URL url = new URL("http://josh-davey.com/news_app_data/news_articles.json");
 
             JSONArray array = returnJson(url).getJSONArray("articles");
 
             for (int i = 0; i < array.length(); i++) {
                 JSONObject temp = array.getJSONObject(i);
-                Log.i("DATA", temp.getString("title").toString());
+                Article obj = new Article(temp.getString("number").toString(),temp.getString("title").toString(),temp.getString("desc").toString());
+                data.add(obj);
+
             }
 
-            return null;
+            return data;
         }
         catch (Exception e)
         {
@@ -46,8 +50,8 @@ public class GetData extends AsyncTask<String, String,String>{
     }
 
     @Override
-    protected void onPostExecute(String s) {
-
+    protected void onPostExecute(ArrayList<Article> result) {
+        Log.i("onPostExec", result.get(0).getTitle());
     }
 
     private JSONObject returnJson(URL url) {
