@@ -28,10 +28,11 @@ public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
 
     @Override
     protected ArrayList<Article> doInBackground(String... params) {
+        String datafilter = params[0];
         try {
             ArrayList<Article> data = new ArrayList<Article>();
 
-            URL url = new URL("http://josh-davey.com/news_app_data/news_articles.json");
+            URL url = new URL("http://josh-davey.com/news_app_data/news_articles_"+datafilter+".json");
 
             //Gets the articles array stored within the downloaded json object.
             JSONArray array = returnJson(url).getJSONArray("articles");

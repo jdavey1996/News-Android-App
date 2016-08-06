@@ -17,7 +17,7 @@ public class Fragment3 extends Fragment {
         super.onCreate(savedInstanceState);
 
         GetData getData = new GetData(getContext(),getActivity());
-        getData.execute();
+        getData.execute("lincoln");
     }
 
     @Override
