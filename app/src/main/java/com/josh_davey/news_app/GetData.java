@@ -17,7 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
+public class GetData extends AsyncTask<String, String,ArrayList<ArticleConstructor>>{
     Context ctx;
     Activity activity;
 
@@ -27,10 +27,10 @@ public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
     }
 
     @Override
-    protected ArrayList<Article> doInBackground(String... params) {
+    protected ArrayList<ArticleConstructor> doInBackground(String... params) {
         String datafilter = params[0];
         try {
-            ArrayList<Article> data = new ArrayList<Article>();
+            ArrayList<ArticleConstructor> data = new ArrayList<ArticleConstructor>();
 
             URL url = new URL("http://josh-davey.com/news_app_data/news_articles_"+datafilter+".json");
 
@@ -40,7 +40,7 @@ public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
             //Loops through al objects within the articles array, adding them to an articles object, then the an ArrayList to be returned to the onPostExecute method.
             for (int i = 0; i < array.length(); i++) {
                 JSONObject temp = array.getJSONObject(i);
-                Article obj = new Article(temp.getString("number").toString(),temp.getString("title").toString(),temp.getString("desc").toString());
+                ArticleConstructor obj = new ArticleConstructor(temp.getString("number").toString(),temp.getString("title").toString(),temp.getString("desc").toString());
                 data.add(obj);
             }
 
@@ -54,10 +54,9 @@ public class GetData extends AsyncTask<String, String,ArrayList<Article>>{
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Article> result) {
-
+    protected void onPostExecute(ArrayList<ArticleConstructor> result) {
         //Uses a listadapter to set the data for the listview in fragment 3.
-        final ListAdapter adapter = new ArticleArrayAdapter(activity, result);
+        final ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, result);
         final ListView list = (ListView) activity.findViewById(R.id.listView);
         list.setAdapter(adapter);
     }

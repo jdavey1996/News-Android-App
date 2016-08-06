@@ -1,11 +1,11 @@
 package com.josh_davey.news_app;
 
-public class Article {
+public class ArticleConstructor {
     public String ArticleNum;
     public String ArticleTitle;
     public String ArticleDesc;
 
-    public Article(String ArticleNum, String Title, String Desc)
+    public ArticleConstructor(String ArticleNum, String Title, String Desc)
     {
         this.ArticleNum = ArticleNum;
         this.ArticleTitle = Title;
