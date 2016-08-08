@@ -4,18 +4,18 @@
     android:layout_height="match_parent"
     tools:context="com.josh_davey.news_app.Fragment3">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Tab3"
-        android:textSize="20dp"
-        android:textColor="#212121"
-        android:background="#ffffff"
-        android:padding="10dp"/>
-
     <ListView
         android:layout_width="332dp"
         android:layout_height="493dp"
         android:id="@+id/listView"
         android:layout_gravity="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Tab3"
+        android:id="@+id/changeTxt"
+        android:layout_gravity="left|top" />
+
 </FrameLayout>

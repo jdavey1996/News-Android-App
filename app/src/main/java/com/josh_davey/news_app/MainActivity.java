@@ -47,4 +47,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    public void closeFrag4(View view)
+    {
+        //Makes the frame invisible containing fragment 4. Allowing the tabbed fragment 3 to be visible.
+        FrameLayout frame = (FrameLayout)findViewById(R.id.framefrag);
+        frame.setVisibility(View.GONE);
+
+        //Makes the tabbed layout visible again to allow navigation along tabs.
+        TabLayout tabLayout = (TabLayout)findViewById(R.id.tab_layout);
+        tabLayout.setVisibility(View.VISIBLE);
+    }
 }

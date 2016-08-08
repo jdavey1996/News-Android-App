@@ -2,10 +2,17 @@ package com.josh_davey.news_app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +38,7 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
         //Initialises elements from the article xml sheet.
         TextView taskNum = (TextView) convertView.findViewById(R.id.section1);
         TextView taskTitle = (TextView) convertView.findViewById(R.id.section2);
-        TextView taskDesc = (TextView) convertView.findViewById(R.id.section3);
+        final TextView taskDesc = (TextView) convertView.findViewById(R.id.section3);
 
         //Gets the current postition when looping through the arraylist.
         final ArticleConstructor data = getItem(position);
@@ -47,6 +54,22 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
             @Override
             public void onClick(View v) {
                 Toast.makeText(context, "This is post number"+data.getArticleNum(), Toast.LENGTH_SHORT).show();
+
+                //Create fragment to send, testing sending article number clicked on to the fragment.
+                Fragment4 fragment = new Fragment4();
+                Bundle bundle = new Bundle();
+                bundle.putString("article", data.getArticleNum());
+                fragment.setArguments(bundle);
+
+                //Creates the fragment in the frame and is made visible.
+                FragmentTransaction ft = ((AppCompatActivity)context).getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.framefrag,fragment).commit();
+                FrameLayout frame = (FrameLayout)activity.findViewById(R.id.framefrag);
+                frame.setVisibility(View.VISIBLE);
+
+                //Makes the tabbedlayout invisible so tabs cannot be selected when viewing an article in detailed view.
+                TabLayout tabLayout = (TabLayout) activity.findViewById(R.id.tab_layout);
+                tabLayout.setVisibility(View.GONE);
             }
         });
 
@@ -56,7 +79,3 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
         return convertView;
     }
 }
-
-
-
-
