@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class Fragment4 extends Fragment {
 
@@ -22,17 +25,20 @@ public class Fragment4 extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("Frag4","Created");
-
-        //Gets the data sent via bundle when creating the fragment. Logs the article number sent via the bundle.
-        Bundle bundle = this.getArguments();
-        String bundledata = bundle.getString("article", "null");
-        Log.i("article instance",bundledata);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment4, container, false);
+        View view = inflater.inflate(R.layout.fragment4, container, false);
+
+        //Gets the data sent via bundle when creating the fragment. Logs the article number sent via the bundle.
+        Bundle bundle = this.getArguments();
+        String bundledata = bundle.getString("article", "null");
+        TextView test = (TextView)view.findViewById(R.id.frag4tv);
+        test.setText(bundledata);
+        //Log.i("article instance",bundledata);
+        return view;
     }
 }
