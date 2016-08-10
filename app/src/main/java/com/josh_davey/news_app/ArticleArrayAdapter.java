@@ -50,7 +50,10 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "This is post number"+data.getArticleNum(), Toast.LENGTH_SHORT).show();
+
+                //Updates a database containing article view counts, for the selected article.
+                ArticleViews updateArticleViews = new ArticleViews(context,activity);
+                updateArticleViews.execute(data.getArticleNum());
 
                 //Create fragment to send, testing sending article number clicked on to the fragment.
                 Fragment4 fragment = new Fragment4();
