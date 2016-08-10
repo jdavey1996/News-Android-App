@@ -35,18 +35,15 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
             convertView = taskInflater.inflate(R.layout.article, parent, false);
         }
 
-        //Initialises elements from the article xml sheet.
-        TextView taskNum = (TextView) convertView.findViewById(R.id.section1);
-        TextView taskTitle = (TextView) convertView.findViewById(R.id.section2);
-        final TextView taskDesc = (TextView) convertView.findViewById(R.id.section3);
+
 
         //Gets the current postition when looping through the arraylist.
         final ArticleConstructor data = getItem(position);
 
-        //Sets the data to be displayed in each textview of the list element in this position.
-        taskNum.setText(data.getArticleNum());
+
+        //Sets task title for each list element.
+        TextView taskTitle = (TextView) convertView.findViewById(R.id.articleTitle);
         taskTitle.setText(data.getArticleTitle());
-        taskDesc.setText(data.getArticleDesc());
 
         /*Sets an onClickListener for the entire list item.
           When an item is clicked it makes a toast displaying the post number clicked on.*/
@@ -58,7 +55,9 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
                 //Create fragment to send, testing sending article number clicked on to the fragment.
                 Fragment4 fragment = new Fragment4();
                 Bundle bundle = new Bundle();
-                bundle.putString("article", data.getArticleNum());
+                bundle.putString("articleNum", data.getArticleNum());
+                bundle.putString("articleTitle", data.getArticleTitle());
+                bundle.putString("articleDesc", data.getArticleDesc());
                 fragment.setArguments(bundle);
 
                 //Creates the fragment in the frame and is made visible.

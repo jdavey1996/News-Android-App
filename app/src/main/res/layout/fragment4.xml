@@ -1,28 +1,58 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     tools:context="com.josh_davey.news_app.Fragment4"
-    android:background="#ea0000"
-    android:clickable="true">
+    android:clickable="true"
+    android:background="#383838">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="frag"
-        android:textSize="20dp"
-        android:textColor="#212121"
-        android:background="#ffffff"
-        android:padding="10dp"
-        android:id="@+id/frag4tv" />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="10dp"
+        android:weightSum="1">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Close"
-        android:id="@+id/closebtn"
-        android:layout_gravity="right|top"
-        android:nestedScrollingEnabled="false"
-        android:onClick="closeFrag4" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Close"
+            android:id="@+id/closebtn"
+            android:layout_gravity="right|top"
+            android:nestedScrollingEnabled="false"
+            android:onClick="closeFrag4" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:id="@+id/articleImg"
+            android:padding="0dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/placeholder"
+            android:layout_weight="0.00" />
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/articleTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="16sp"
+            android:layout_below="@+id/articleImg"
+            android:background="@color/colorPrimary"
+            android:autoText="false" />
+
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/articleDesc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="16sp"
+            android:layout_below="@+id/articleTitle"
+            android:background="@color/colorPrimary"
+            android:autoText="false" />
+
+
+    </LinearLayout>
 
 </FrameLayout>

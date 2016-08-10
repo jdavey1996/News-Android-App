@@ -35,10 +35,14 @@ public class Fragment4 extends Fragment {
 
         //Gets the data sent via bundle when creating the fragment. Logs the article number sent via the bundle.
         Bundle bundle = this.getArguments();
-        String bundledata = bundle.getString("article", "null");
-        TextView test = (TextView)view.findViewById(R.id.frag4tv);
-        test.setText(bundledata);
-        //Log.i("article instance",bundledata);
+        String bundleArticleNum = bundle.getString("articleNum", "null");
+        String bundleArticleTitle = bundle.getString("articleTitle", "null");
+        String bundleArticleDesc = bundle.getString("articleDesc", "null");
+
+        TextView title = (TextView)view.findViewById(R.id.articleTitle);
+        title.setText(bundleArticleTitle);
+        TextView desc = (TextView)view.findViewById(R.id.articleDesc);
+        desc.setText(bundleArticleDesc);
         return view;
     }
 }

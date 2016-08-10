@@ -2,20 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.josh_davey.news_app.Fragment3">
+    tools:context="com.josh_davey.news_app.Fragment3"
+    android:padding="10dp"
+    android:background="#383838">
 
     <ListView
-        android:layout_width="332dp"
-        android:layout_height="493dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/listView"
         android:layout_gravity="center" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Tab3"
-        android:id="@+id/changeTxt"
-        android:layout_gravity="left|top" />
 
 </FrameLayout>
