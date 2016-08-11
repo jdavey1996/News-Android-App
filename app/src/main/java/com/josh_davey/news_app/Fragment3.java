@@ -16,8 +16,8 @@ public class Fragment3 extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        GetData getData = new GetData(getContext(),getActivity());
-        getData.execute("lincoln");
+        GetAllArticles getData = new GetAllArticles(getContext(),getActivity());
+        getData.execute("all");
     }
 
     @Override

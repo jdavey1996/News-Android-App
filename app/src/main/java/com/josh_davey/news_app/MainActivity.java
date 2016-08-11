@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Local"));
-        tabLayout.addTab(tabLayout.newTab().setText("Top rated"));
+        tabLayout.addTab(tabLayout.newTab().setText("Most Viewed"));
         tabLayout.addTab(tabLayout.newTab().setText("All"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void closeFrag4(View view)
     {
-        //Makes the frame invisible containing fragment 4. Allowing the tabbed fragment 3 to be visible.
+        //Makes the frame invisible containing fragment 4.
         FrameLayout frame = (FrameLayout)findViewById(R.id.framefrag);
         frame.setVisibility(View.GONE);
 

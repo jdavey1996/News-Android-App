@@ -17,6 +17,9 @@ public class Fragment2 extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        GetMostViewedArticles getData = new GetMostViewedArticles(getContext(),getActivity());
+        getData.execute();
     }
 
     @Override

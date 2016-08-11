@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -52,8 +49,8 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
             public void onClick(View v) {
 
                 //Updates a database containing article view counts, for the selected article.
-                ArticleViews updateArticleViews = new ArticleViews(context,activity);
-                updateArticleViews.execute(data.getArticleNum());
+                UpdateViewCount update = new UpdateViewCount(context,activity);
+                update.execute(data.getArticleNum());
 
                 //Create fragment to send, testing sending article number clicked on to the fragment.
                 Fragment4 fragment = new Fragment4();

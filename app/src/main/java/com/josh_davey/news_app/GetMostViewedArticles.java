@@ -17,25 +17,24 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GetData extends AsyncTask<String, String,ArrayList<ArticleConstructor>>{
+public class GetMostViewedArticles extends AsyncTask<String, String,ArrayList<ArticleConstructor>>{
     Context ctx;
     Activity activity;
 
-    public GetData(Context ctx, Activity activity) {
+    public GetMostViewedArticles(Context ctx, Activity activity) {
         this.ctx = ctx;
         this.activity = activity;
     }
 
     @Override
     protected ArrayList<ArticleConstructor> doInBackground(String... params) {
-        String datafilter = params[0];
         try {
             ArrayList<ArticleConstructor> data = new ArrayList<ArticleConstructor>();
 
-            URL url = new URL("http://josh-davey.com/news_app_data/news_articles_"+datafilter+".json");
+            URL url = new URL("http://josh-davey.com/news_app_data/news_articles-most_viewed_articles.php");
 
             //Gets the articles array stored within the downloaded json object.
-            JSONArray array = returnJson(url).getJSONArray("articles");
+            JSONArray array = returnJson(url);
 
             //Loops through al objects within the articles array, adding them to an articles object, then the an ArrayList to be returned to the onPostExecute method.
             for (int i = 0; i < array.length(); i++) {
@@ -48,20 +47,21 @@ public class GetData extends AsyncTask<String, String,ArrayList<ArticleConstruct
         }
         catch (Exception e)
         {
-            Log.i("doInBackground error", e.toString());
+            //Catches exceptions and displays them in the Log.
+            Log.e("Exception: ", e.toString());
             return null;
         }
     }
 
     @Override
     protected void onPostExecute(ArrayList<ArticleConstructor> result) {
-        //Uses a listadapter to set the data for the listview in fragment 3.
+        //Uses a listadapter to set the data for the listview in fragment 2.
         final ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, result);
-        final ListView list = (ListView) activity.findViewById(R.id.listView);
+        final ListView list = (ListView) activity.findViewById(R.id.lvMostViewedArticles);
         list.setAdapter(adapter);
     }
 
-    private JSONObject returnJson(URL url) {
+    private JSONArray returnJson(URL url) {
         try {
             //Sets the connection.
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -80,13 +80,13 @@ public class GetData extends AsyncTask<String, String,ArrayList<ArticleConstruct
             iStream.close();
 
             //Convert reader response to a JSON object.
-            JSONObject data = new JSONObject(response.toString());
+            JSONArray data = new JSONArray(response.toString());
 
             //Returns JSON object containing the data.
             return data;
         } catch (Exception e) {
             //Catches exceptions and displays them in the Log.
-            Log.e("GetData exception: ", e.toString());
+            Log.e("Exception: ", e.toString());
         }
         return null;
     }

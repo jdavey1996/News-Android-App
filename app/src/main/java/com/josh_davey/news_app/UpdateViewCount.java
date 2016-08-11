@@ -21,11 +21,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-public class ArticleViews extends AsyncTask<String, String, String>{
+public class UpdateViewCount extends AsyncTask<String, String, String>{
     Context ctx;
     Activity activity;
 
-    public ArticleViews(Context ctx, Activity activity) {
+    public UpdateViewCount(Context ctx, Activity activity) {
         this.ctx = ctx;
         this.activity = activity;
     }
@@ -35,7 +35,7 @@ public class ArticleViews extends AsyncTask<String, String, String>{
         String article = params[0];
 
                 try {
-                    URL url = new URL("http://josh-davey.com/news_app_data/news_articles_addview.php");
+                    URL url = new URL("http://josh-davey.com/news_app_data/news_articles-update_view_count.php");
 
                     //Article number to send.
                     String data  = URLEncoder.encode("article", "UTF-8")
@@ -45,14 +45,15 @@ public class ArticleViews extends AsyncTask<String, String, String>{
                 }
                 catch (Exception e)
                 {
-                    Log.i("doInBackground error", e.toString());
+                    //Catches exceptions and displays them in the Log.
+                    Log.e("Exception: ", e.toString());
                     return null;
                 }
     }
 
     @Override
     protected void onPostExecute(String result) {
-        //May not need onPostExecute method. 
+        //May not need onPostExecute method.
 
     }
 
@@ -92,7 +93,7 @@ public class ArticleViews extends AsyncTask<String, String, String>{
         catch (Exception e)
         {
             //Catches exceptions and displays them in the Log.
-            Log.e("addView exception: ", e.toString());
+            Log.e("Exception: ", e.toString());
         }
     return null;
     }
