@@ -3,6 +3,8 @@ package com.josh_davey.news_app;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -20,10 +22,11 @@ import java.util.ArrayList;
 public class GetAllArticles extends AsyncTask<String, String,ArrayList<ArticleConstructor>>{
     Context ctx;
     Activity activity;
-
-    public GetAllArticles(Context ctx, Activity activity) {
+    Fragment frag;
+    public GetAllArticles(Context ctx, Activity activity, Fragment frag) {
         this.ctx = ctx;
         this.activity = activity;
+        this.frag = frag;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class GetAllArticles extends AsyncTask<String, String,ArrayList<ArticleCo
                 ArticleConstructor obj = new ArticleConstructor(temp.getString("number").toString(),temp.getString("title").toString(),temp.getString("desc").toString());
                 data.add(obj);
             }
-
+            Thread.sleep(2000);
             return data;
         }
         catch (Exception e)
@@ -60,6 +63,10 @@ public class GetAllArticles extends AsyncTask<String, String,ArrayList<ArticleCo
         final ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, result);
         final ListView list = (ListView) activity.findViewById(R.id.lvAllArticles);
         list.setAdapter(adapter);
+
+        //Stops refresh animation.
+        SwipeRefreshLayout sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout3);
+        sw.setRefreshing(false);
     }
 
     private JSONObject returnJson(URL url) {

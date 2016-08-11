@@ -6,10 +6,17 @@
     android:padding="10dp"
     android:background="#383838">
 
-    <ListView
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/lvMostViewedArticles"
-        android:layout_gravity="center" />
+        android:id="@+id/refreshLayout2">7
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/lvMostViewedArticles"
+            android:layout_gravity="center" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </FrameLayout>
