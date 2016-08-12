@@ -6,9 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +19,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        //Listens for when the actionbar back button is pressed and closes fragment4.
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closeFrag4(null);
+            }
+        });
+
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Local"));
@@ -63,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tab_layout);
         tabLayout.setVisibility(View.VISIBLE);
 
-        //Makes the close button invisible when closing fragment 4.
-        Button closebtn = (Button)findViewById(R.id.closebtn);
-        closebtn.setVisibility(View.GONE);
+        //Makes the action bar close button invisible when closing fragment 4.
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 }

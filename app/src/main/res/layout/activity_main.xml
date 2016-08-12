@@ -13,16 +13,6 @@
         android:background="?attr/colorPrimary"
         android:elevation="6dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Close"
-            android:id="@+id/closebtn"
-            android:layout_gravity="left|top"
-            android:nestedScrollingEnabled="false"
-            android:onClick="closeFrag4"
-            android:visibility="gone" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

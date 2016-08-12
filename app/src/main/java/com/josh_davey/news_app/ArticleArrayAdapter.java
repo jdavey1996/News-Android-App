@@ -72,9 +72,8 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
                 TabLayout tabLayout = (TabLayout) activity.findViewById(R.id.tab_layout);
                 tabLayout.setVisibility(View.GONE);
 
-                //Makes the close button visible when loading fragment 4.
-                Button closebtn = (Button) activity.findViewById(R.id.closebtn);
-                closebtn.setVisibility(View.VISIBLE);
+                //Enables the actionbar back button.
+                ((MainActivity) activity).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
         });
 
