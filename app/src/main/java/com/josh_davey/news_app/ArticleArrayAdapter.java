@@ -5,11 +5,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -69,6 +71,10 @@ public class ArticleArrayAdapter extends ArrayAdapter<ArticleConstructor>{
                 //Makes the tabbedlayout invisible so tabs cannot be selected when viewing an article in detailed view.
                 TabLayout tabLayout = (TabLayout) activity.findViewById(R.id.tab_layout);
                 tabLayout.setVisibility(View.GONE);
+
+                //Makes the close button visible when loading fragment 4.
+                Button closebtn = (Button) activity.findViewById(R.id.closebtn);
+                closebtn.setVisibility(View.VISIBLE);
             }
         });
 

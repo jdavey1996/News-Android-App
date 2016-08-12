@@ -12,14 +12,7 @@
         android:paddingBottom="10dp"
         android:weightSum="1">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Close"
-            android:id="@+id/closebtn"
-            android:layout_gravity="right|top"
-            android:nestedScrollingEnabled="false"
-            android:onClick="closeFrag4" />
+
 
         <ImageView
             android:layout_width="match_parent"
