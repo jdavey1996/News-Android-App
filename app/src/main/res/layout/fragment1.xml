@@ -1,17 +1,21 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context="com.josh_davey.news_app.Fragment1"
+android:padding="10dp"
+android:background="#383838">
+
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.josh_davey.news_app.Fragment1"
-    android:background="#383838">
+    android:id="@+id/refreshLayout1">7
 
-    <TextView
-        android:layout_width="76dp"
-        android:layout_height="wrap_content"
-        android:text="Tab1"
-        android:textSize="20dp"
-        android:textColor="#212121"
-        android:background="#ffffff"
-        android:padding="10dp"/>
-
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lvArticlesLocation"
+        android:layout_gravity="center" />
+</android.support.v4.widget.SwipeRefreshLayout>
 </FrameLayout>

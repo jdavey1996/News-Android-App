@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,13 +60,35 @@ public class GetAllArticles extends AsyncTask<String, String,ArrayList<ArticleCo
 
     @Override
     protected void onPostExecute(ArrayList<ArticleConstructor> result) {
-        //Uses a listadapter to set the data for the listview in fragment 3.
+        //Creates an instance of the arrayadapter, passing the returned results.
         final ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, result);
-        final ListView list = (ListView) activity.findViewById(R.id.lvAllArticles);
+
+        //Initialises a listview as null for use in if statements.
+        ListView list = null;
+        SwipeRefreshLayout sw = null;
+
+        if (frag instanceof Fragment3)
+        {
+            //Gets the list for fragment3 if the passed fragment is an instance of fragment3.
+            list = (ListView) activity.findViewById(R.id.lvAllArticles);
+
+            //Gets refresh layout for fragment, containing the listview.
+            sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout3);
+        }
+        else if (frag instanceof Fragment1)
+        {
+            //Gets the list for fragment1 if the passed fragment is an instance of fragment1.
+            list = (ListView) activity.findViewById(R.id.lvArticlesLocation);
+
+            //Gets refresh layout for fragment, containing the listview.
+            sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout1);
+
+        }
+
+        //Sets the adapter to the listview.
         list.setAdapter(adapter);
 
-        //Stops refresh animation.
-        SwipeRefreshLayout sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout3);
+        //Sets refresh aniation to false.
         sw.setRefreshing(false);
     }
 
