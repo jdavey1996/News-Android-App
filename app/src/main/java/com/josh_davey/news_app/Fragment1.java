@@ -1,6 +1,7 @@
 package com.josh_davey.news_app;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -17,7 +18,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,8 +40,57 @@ Context ct = this.getContext();
         //Requesting permission to access device location.
         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
 
-        loadData();
+
+
+
+        //loadData();
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            LocationManager mLocationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
+
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+
+        }
+    }
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            Log.i("LOCATION", "Latitude="+Double.toString(location.getLatitude()) + "  Longitude="+Double.toString(location.getLongitude()) );
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,17 +132,6 @@ Context ct = this.getContext();
         }
     }
 
-    public boolean checkPermissionGranted()
-    {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
     public boolean checkLocationProviderEnabled()
     {
