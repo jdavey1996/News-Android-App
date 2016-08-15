@@ -61,6 +61,25 @@ Context ct = this.getContext();
         @Override
         public void onLocationChanged(final Location location) {
             Log.i("LOCATION", "Latitude="+Double.toString(location.getLatitude()) + "  Longitude="+Double.toString(location.getLongitude()) );
+
+            Geocoder gcd = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
+            List<Address>  addresses;
+            try
+            {
+                addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                if (addresses.size() > 0)
+                {
+                    String cityName = addresses.get(0).getLocality();
+                    Log.i("test","Curent address is" + cityName);
+                }
+                else
+                {
+                    Log.i("test","No location");
+                }
+            } catch (Exception e)
+            {
+
+            }
         }
 
         @Override
