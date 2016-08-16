@@ -3,6 +3,7 @@ package com.josh_davey.news_app;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,47 +41,40 @@ Context ct = this.getContext();
 
         //Requesting permission to access device location.
         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-
-
-
-
-        //loadData();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            LocationManager mLocationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
 
+            final LocationManager mLocationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
 
+            Button testb = (Button)getView().findViewById(R.id.TESTbtn);
+
+            testb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                        Location loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                        String latestCity = getCity(loc);
+                        if (latestCity.equals(null))
+                        {
+                            Log.i("Loc","err");
+                        }
+                        else
+                        Log.i("lastest locc", latestCity);
+                    }
+                }
+            });
         }
-    }
 
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(final Location location) {
-            Log.i("LOCATION", "Latitude="+Double.toString(location.getLatitude()) + "  Longitude="+Double.toString(location.getLongitude()) );
 
-            Geocoder gcd = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
-            List<Address>  addresses;
-            try
-            {
-                addresses = gcd.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                if (addresses.size() > 0)
-                {
-                    String cityName = addresses.get(0).getLocality();
-                    Log.i("test","Curent address is" + cityName);
-                }
-                else
-                {
-                    Log.i("test","No location");
-                }
-            } catch (Exception e)
-            {
-
-            }
         }
 
         @Override
@@ -98,19 +93,6 @@ Context ct = this.getContext();
         }
     };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -124,50 +106,40 @@ Context ct = this.getContext();
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        loadData();
+                        //loadData();
                     }
                 }
         );
         return view;
     }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        if (isVisibleToUser) {
-            locationManager= (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-            //Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            //Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            Boolean isGPSEnabled;
-            Boolean isNetworkEnabled;
-
-            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            Log.i("GPS Status", String.valueOf(isGPSEnabled));
-            Log.i("Network Status", String.valueOf(isNetworkEnabled));
-        }
-    }
 
 
-    public boolean checkLocationProviderEnabled()
-    {
-        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)== true || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == true)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 
-    public void loadData()
+    public void loadData(String location)
     {
         GetAllArticles getData = new GetAllArticles(getContext(),getActivity(),this);
-        getData.execute("lincoln");
+        getData.execute(location);
+    }
+
+
+    public String getCity(Location location)
+    {
+        Geocoder geo = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
+        List<Address> data;
+        String city = null;
+        try {
+            data = geo.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (data.size() > 0) {
+                city = data.get(0).getLocality();
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+        return city;
     }
 }
+
 

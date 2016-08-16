@@ -9,7 +9,7 @@ android:background="#383838">
 <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="446dp"
     android:id="@+id/refreshLayout1">7
 
     <ListView
@@ -18,4 +18,11 @@ android:background="#383838">
         android:id="@+id/lvArticlesLocation"
         android:layout_gravity="center" />
 </android.support.v4.widget.SwipeRefreshLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEST"
+        android:id="@+id/TESTbtn"
+        android:layout_gravity="center_horizontal|bottom" />
 </FrameLayout>
