@@ -31,9 +31,9 @@ public class Fragment1 extends Fragment{
     public Fragment1() {
         // Required empty public constructor
     }
-Context ct = this.getContext();
-    //Variables
-    LocationManager locationManager;
+
+    SwipeRefreshLayout sw;
+    LocationManager mLocationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,35 +41,20 @@ Context ct = this.getContext();
 
         //Requesting permission to access device location.
         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mLocationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+        }
+
     }
+
 
     @Override
     public void onStart() {
         super.onStart();
-
-            final LocationManager mLocationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
-
-            Button testb = (Button)getView().findViewById(R.id.TESTbtn);
-
-            testb.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                        Location loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                        String latestCity = getCity(loc);
-                        if (latestCity.equals(null))
-                        {
-                            Log.i("Loc","err");
-                        }
-                        else
-                        Log.i("lastest locc", latestCity);
-                    }
-                }
-            });
-        }
+        loadData();
+    }
 
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
@@ -99,14 +84,14 @@ Context ct = this.getContext();
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment1, container, false);
 
-        final SwipeRefreshLayout sw = (SwipeRefreshLayout)view.findViewById(R.id.refreshLayout1);
+        sw = (SwipeRefreshLayout)view.findViewById(R.id.refreshLayout1);
 
         //Reloads data on swipe down.
         sw.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
-                        //loadData();
+                        loadData();
                     }
                 }
         );
@@ -116,10 +101,26 @@ Context ct = this.getContext();
 
 
 
-    public void loadData(String location)
+    public void loadData()
     {
-        GetAllArticles getData = new GetAllArticles(getContext(),getActivity(),this);
-        getData.execute(location);
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            Location loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            String latestCity = getCity(loc);
+            if (latestCity.equals("null")) {
+                Log.i("Loc", "err");
+                sw.setRefreshing(false);
+            }
+            else
+            {
+                Log.i("lastest locc", latestCity);
+                sw.setRefreshing(false);
+            }
+        }
+
+      //  GetAllArticles getData = new GetAllArticles(getContext(),getActivity(),this);
+        //getData.execute(//CITY STRING);
     }
 
 
@@ -127,7 +128,7 @@ Context ct = this.getContext();
     {
         Geocoder geo = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
         List<Address> data;
-        String city = null;
+        String city = "null";
         try {
             data = geo.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (data.size() > 0) {
