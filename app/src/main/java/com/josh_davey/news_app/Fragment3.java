@@ -41,7 +41,7 @@ public class Fragment3 extends Fragment {
 
     public void loadData()
     {
-        GetAllArticles getData = new GetAllArticles(getContext(),getActivity(),this);
+        GetArticles getData = new GetArticles(getContext(),getActivity(),this);
         getData.execute("all");
     }
 }

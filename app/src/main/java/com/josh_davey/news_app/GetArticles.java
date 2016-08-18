@@ -20,11 +20,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GetAllArticles extends AsyncTask<String, String,ArrayList<ArticleConstructor>>{
+public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConstructor>>{
     Context ctx;
     Activity activity;
     Fragment frag;
-    public GetAllArticles(Context ctx, Activity activity, Fragment frag) {
+    public GetArticles(Context ctx, Activity activity, Fragment frag) {
         this.ctx = ctx;
         this.activity = activity;
         this.frag = frag;
