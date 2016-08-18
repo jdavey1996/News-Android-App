@@ -46,6 +46,16 @@ public class Fragment1 extends Fragment{
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        //When the app is paused (eg, returning to home screen without closing), location updates are removed to save battery.
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.i("TE","ST");
+            mLocationManager.removeUpdates(mLocationListener);
+        }
+    }
+
     //Runs when the user responds to permission requests.
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
