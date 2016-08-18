@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class Fragment1 extends Fragment{
 
     SwipeRefreshLayout sw;
     LocationManager mLocationManager;
+    TextView errorText;
 
     @Override
     public void onStart() {
@@ -51,7 +53,6 @@ public class Fragment1 extends Fragment{
         super.onPause();
         //When the app is paused (eg, returning to home screen without closing), location updates are removed to save battery.
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.i("TE","ST");
             mLocationManager.removeUpdates(mLocationListener);
         }
     }
@@ -73,6 +74,9 @@ public class Fragment1 extends Fragment{
                 else
                 {
                     Log.i("Location permissions","Not granted");
+                    //If permission is not granted, error message is set and made visible.
+                    errorText.setText("Location permissions are disabled. Please enable to view by location.");
+                    errorText.setVisibility(View.VISIBLE);
                 }
         }
     }
@@ -105,6 +109,9 @@ public class Fragment1 extends Fragment{
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment1, container, false);
 
+        //Initialises textview for error messages.
+        errorText = (TextView)view.findViewById(R.id.frag1ErrorMsg);
+
         //Initialises swipe refresh layout 1 for fragment1.
         sw = (SwipeRefreshLayout)view.findViewById(R.id.refreshLayout1);
 
@@ -133,6 +140,7 @@ public class Fragment1 extends Fragment{
     public void loadData()
     {
         try {
+
             //Gets the last known location.
             Location loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -144,7 +152,12 @@ public class Fragment1 extends Fragment{
                 Log.i("Location", "err");
                 Toast.makeText(getContext(), "ERROR", Toast.LENGTH_SHORT).show();
                 sw.setRefreshing(false);
+                errorText.setText("Unable to get location, please swipe down to refresh.");
+                errorText.setVisibility(View.VISIBLE);
             } else {
+                //Makes visible gone if data is loading, indicating location services have been turned on manually by the user.
+                errorText.setVisibility(View.GONE);
+
                 Log.i("Latest Location", latestCity);
                 Toast.makeText(getContext(), latestCity, Toast.LENGTH_SHORT).show();
                 GetArticles getData = new GetArticles(getContext(), getActivity(), this);
