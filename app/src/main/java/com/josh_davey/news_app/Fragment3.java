@@ -14,8 +14,8 @@ public class Fragment3 extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onStart() {
+        super.onStart();
         loadData();
     }
 
