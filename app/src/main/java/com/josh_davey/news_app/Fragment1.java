@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -28,23 +27,20 @@ public class Fragment1 extends Fragment{
 
     SwipeRefreshLayout sw;
     LocationManager mLocationManager;
-    TextView errorText;
 
     @Override
     public void onStart() {
         super.onStart();
-        /*Everytime the app is started (including closed and reopened), it checks if permissions for location aree granted.
+        /*Everytime the app is started (including closed and reopened), it checks if permissions for location are granted.
           If so it requests location updates and runs the load data method.
           If not, it requests permissions from the user.*/
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
             loadData();
-        }
-        else
-        {
+        } else {
             //Requesting permission to access device location.
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
     }
 
@@ -64,7 +60,7 @@ public class Fragment1 extends Fragment{
         {
             //Tasks to execute depending on the response from a request to access location data.
             case 1:
-                //If the user grants the location permission, request location updates and load data. Else _____ **add a text field that displays**
+                //If the user grants the location permission, request location updates and load data.
                 if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     mLocationManager = (LocationManager) getContext().getSystemService(getContext().LOCATION_SERVICE);
                     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
@@ -74,9 +70,8 @@ public class Fragment1 extends Fragment{
                 else
                 {
                     Log.i("Location permissions","Not granted");
-                    //If permission is not granted, error message is set and made visible.
-                    errorText.setText("Location permissions are disabled. Please enable to view by location.");
-                    errorText.setVisibility(View.VISIBLE);
+                    //If permission is not granted, error message is displayed.
+                    Toast.makeText(getContext(), "Location permissions are disabled. Please enable to view by location.", Toast.LENGTH_SHORT).show();;
                 }
         }
     }
@@ -108,9 +103,6 @@ public class Fragment1 extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment1, container, false);
-
-        //Initialises textview for error messages.
-        errorText = (TextView)view.findViewById(R.id.frag1ErrorMsg);
 
         //Initialises swipe refresh layout 1 for fragment1.
         sw = (SwipeRefreshLayout)view.findViewById(R.id.refreshLayout1);
@@ -149,43 +141,39 @@ public class Fragment1 extends Fragment{
             //If the city returned is null, error.
             //If not, execute the getArticles asynctask, passing the city string as an argument to get the correct data.
             if (latestCity.equals("null")) {
-                Log.i("Location", "err");
-                Toast.makeText(getContext(), "ERROR", Toast.LENGTH_SHORT).show();
                 sw.setRefreshing(false);
-                errorText.setText("Unable to get location, please swipe down to refresh.");
-                errorText.setVisibility(View.VISIBLE);
+                Toast.makeText(getContext(), "Unable to get location, please check your network connection and Location settings then swipe down to refresh.", Toast.LENGTH_SHORT).show();
             } else {
-                //Makes visible gone if data is loading, indicating location services have been turned on manually by the user.
-                errorText.setVisibility(View.GONE);
-
-                Log.i("Latest Location", latestCity);
-                Toast.makeText(getContext(), latestCity, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), latestCity, Toast.LENGTH_SHORT).show();
                 GetArticles getData = new GetArticles(getContext(), getActivity(), this);
                 getData.execute(latestCity);
             }
         }
         catch (SecurityException e)
         {
-            Log.i("loadData()exception", e.toString());
         }
     }
 
-    //Uses a location, running ti through a geocoder to get the data extracted. This then gets the city from that data and returns it.
+    //Uses a location, running it through a geocoder to get the information behind the lat and long values.
+    //This then gets the city from that information and returns it.
     public String getCity(Location location)
     {
-        Geocoder geo = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
-        List<Address> data;
-        String city = "null";
         try {
-            data = geo.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            if (data.size() > 0) {
-                city = data.get(0).getLocality();
+            Geocoder geo = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
+            List<Address> data;
+            String city = "null";
+            try {
+                data = geo.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                if (data.size() > 0) {
+                    city = data.get(0).getLocality();
+                }
+            } catch (Exception e) {
             }
+            return city;
         }
         catch (Exception e)
         {
-            Log.i("getCity()exception", e.toString());
+            return null;
         }
-        return city;
     }
 }

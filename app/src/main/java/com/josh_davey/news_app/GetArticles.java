@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -52,44 +51,50 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
         }
         catch (Exception e)
         {
-            //Catches exceptions and displays them in the Log.
-            Log.e("Exception: ", e.toString());
             return null;
         }
     }
 
     @Override
     protected void onPostExecute(ArrayList<ArticleConstructor> result) {
-        //Creates an instance of the arrayadapter, passing the returned results.
-        final ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, result);
+        try {
+            //Initialises a listview as null for use in if statements.
+            ListView list = null;
+            SwipeRefreshLayout sw = null;
 
-        //Initialises a listview as null for use in if statements.
-        ListView list = null;
-        SwipeRefreshLayout sw = null;
+            if (frag instanceof Fragment3) {
+                //Gets the list for fragment3 if the passed fragment is an instance of fragment3.
+                list = (ListView) activity.findViewById(R.id.lvAllArticles);
 
-        if (frag instanceof Fragment3)
-        {
-            //Gets the list for fragment3 if the passed fragment is an instance of fragment3.
-            list = (ListView) activity.findViewById(R.id.lvAllArticles);
+                //Gets refresh layout for fragment, containing the listview.
+                sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout3);
 
-            //Gets refresh layout for fragment, containing the listview.
-            sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout3);
+            } else if (frag instanceof Fragment1) {
+                //Gets the list for fragment1 if the passed fragment is an instance of fragment1.
+                list = (ListView) activity.findViewById(R.id.lvArticlesLocation);
+
+                //Gets refresh layout for fragment, containing the listview.
+                sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout1);
+            }
+
+            if(result != null) {
+                //Creates an instance of the arrayadapter, passing the returned results.
+                final ListAdapter adapter = new ArticleArrayAdapter(activity, ctx, result);
+
+                //Sets the adapter to the listview.
+                list.setAdapter(adapter);
+            }
+            else
+            {
+                Toast.makeText(ctx, "Unable to load data, please check your network connection and swipe down to refresh.", Toast.LENGTH_SHORT).show();
+            }
+
+            //Sets refresh aniation to false.
+            sw.setRefreshing(false);
         }
-        else if (frag instanceof Fragment1)
+        catch (Exception e)
         {
-            //Gets the list for fragment1 if the passed fragment is an instance of fragment1.
-            list = (ListView) activity.findViewById(R.id.lvArticlesLocation);
-
-            //Gets refresh layout for fragment, containing the listview.
-            sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout1);
-
         }
-
-        //Sets the adapter to the listview.
-        list.setAdapter(adapter);
-
-        //Sets refresh aniation to false.
-        sw.setRefreshing(false);
     }
 
     private JSONObject returnJson(URL url) {
@@ -116,8 +121,6 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
             //Returns JSON object containing the data.
             return data;
         } catch (Exception e) {
-            //Catches exceptions and displays them in the Log.
-            Log.e("Exception: ", e.toString());
         }
         return null;
     }

@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,14 +59,28 @@ public class GetMostViewedArticles extends AsyncTask<String, String,ArrayList<Ar
 
     @Override
     protected void onPostExecute(ArrayList<ArticleConstructor> result) {
-        //Uses a listadapter to set the data for the listview in fragment 2.
-        final ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, result);
-        final ListView list = (ListView) activity.findViewById(R.id.lvMostViewedArticles);
-        list.setAdapter(adapter);
+        try {
+            //Uses a listadapter to set the data for the listview in fragment 2.
+            final ListAdapter adapter = new ArticleArrayAdapter(activity, ctx, result);
+            final ListView list = (ListView) activity.findViewById(R.id.lvMostViewedArticles);
 
-        //Stops refresh animation.
-        SwipeRefreshLayout sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout2);
-        sw.setRefreshing(false);
+            if(result != null) {
+                //Sets the adapter to the listview.
+                list.setAdapter(adapter);
+            }
+            else
+            {
+                Toast.makeText(ctx, "Unable to load data, please check your network connection and swipe down to refresh.", Toast.LENGTH_SHORT).show();
+            }
+
+            //Stops refresh animation.
+            SwipeRefreshLayout sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout2);
+            sw.setRefreshing(false);
+        }
+        catch (Exception e)
+        {
+            Log.i("Execption",e.toString());
+        }
     }
 
     private JSONArray returnJson(URL url) {

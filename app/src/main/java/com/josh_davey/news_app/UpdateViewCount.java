@@ -4,11 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,7 +14,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 
 public class UpdateViewCount extends AsyncTask<String, String, String>{
     Context ctx;
@@ -53,7 +47,6 @@ public class UpdateViewCount extends AsyncTask<String, String, String>{
 
     @Override
     protected void onPostExecute(String result) {
-        //May not need onPostExecute method.
 
     }
 

@@ -6,7 +6,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 public class Fragment2 extends Fragment {
 
@@ -42,7 +41,12 @@ public class Fragment2 extends Fragment {
 
     public void loadData()
     {
-        GetMostViewedArticles getData = new GetMostViewedArticles(getContext(),getActivity(),this);
-        getData.execute();
+        try {
+            GetMostViewedArticles getData = new GetMostViewedArticles(getContext(), getActivity(), this);
+            getData.execute();
+        }
+        catch (Exception e)
+        {
+        }
     }
 }

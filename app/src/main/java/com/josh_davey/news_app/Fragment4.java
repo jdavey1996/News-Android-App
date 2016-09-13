@@ -1,19 +1,12 @@
 package com.josh_davey.news_app;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class Fragment4 extends Fragment {
 
@@ -39,6 +32,7 @@ public class Fragment4 extends Fragment {
         String bundleArticleTitle = bundle.getString("articleTitle", "null");
         String bundleArticleDesc = bundle.getString("articleDesc", "null");
 
+        //Sets title and description for selected article.
         TextView title = (TextView)view.findViewById(R.id.articleTitle);
         title.setText(bundleArticleTitle);
         TextView desc = (TextView)view.findViewById(R.id.articleDesc);

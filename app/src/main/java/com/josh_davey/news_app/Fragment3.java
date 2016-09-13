@@ -41,7 +41,12 @@ public class Fragment3 extends Fragment {
 
     public void loadData()
     {
-        GetArticles getData = new GetArticles(getContext(),getActivity(),this);
-        getData.execute("all");
+        try {
+            GetArticles getData = new GetArticles(getContext(), getActivity(), this);
+            getData.execute("all");
+        }
+        catch (Exception e)
+        {
+        }
     }
 }
