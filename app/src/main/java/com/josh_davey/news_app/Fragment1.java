@@ -140,9 +140,9 @@ public class Fragment1 extends Fragment{
             String latestCity = getCity(loc);
             //If the city returned is null, error.
             //If not, execute the getArticles asynctask, passing the city string as an argument to get the correct data.
-            if (latestCity.equals("null")) {
+            if (latestCity == null) {
                 sw.setRefreshing(false);
-                Toast.makeText(getContext(), "Unable to get location, please check your network connection and Location settings then swipe down to refresh.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Unable to acquire your location, check your settings and try again later.", Toast.LENGTH_SHORT).show();
             } else {
                 //Toast.makeText(getContext(), latestCity, Toast.LENGTH_SHORT).show();
                 GetArticles getData = new GetArticles(getContext(), getActivity(), this);

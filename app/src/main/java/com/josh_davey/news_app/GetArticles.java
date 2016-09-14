@@ -23,6 +23,7 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
     Context ctx;
     Activity activity;
     Fragment frag;
+    Integer articleAmount = 0;
     public GetArticles(Context ctx, Activity activity, Fragment frag) {
         this.ctx = ctx;
         this.activity = activity;
@@ -45,6 +46,8 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
                 JSONObject temp = array.getJSONObject(i);
                 ArticleConstructor obj = new ArticleConstructor(temp.getString("number").toString(),temp.getString("title").toString(),temp.getString("desc").toString());
                 data.add(obj);
+                //Add one to variable containing amount of articles.
+                articleAmount = articleAmount + 1;
             }
             Thread.sleep(2000);
             return data;
@@ -77,6 +80,8 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
                 sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout1);
             }
 
+            //If the returned result isn't null (data has been downloaded), it sets the data to the listview via the adapter.
+            //If not, the correct error message is displayed. Either no articles available, or unable to load data.
             if(result != null) {
                 //Creates an instance of the arrayadapter, passing the returned results.
                 final ListAdapter adapter = new ArticleArrayAdapter(activity, ctx, result);
@@ -86,7 +91,14 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
             }
             else
             {
-                Toast.makeText(ctx, "Unable to load data, please check your network connection and swipe down to refresh.", Toast.LENGTH_SHORT).show();
+                if (articleAmount == 0)
+                {
+                    list.setAdapter(null);
+                    Toast.makeText(ctx, "No articles available for your location.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(ctx, "Unable to load data, please check your network connection and swipe down to refresh.", Toast.LENGTH_SHORT).show();
+                }
             }
 
             //Sets refresh aniation to false.
