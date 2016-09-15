@@ -39,8 +39,6 @@ public class UpdateViewCount extends AsyncTask<String, String, String>{
                 }
                 catch (Exception e)
                 {
-                    //Catches exceptions and displays them in the Log.
-                    Log.e("Exception: ", e.toString());
                     return null;
                 }
     }
@@ -85,8 +83,6 @@ public class UpdateViewCount extends AsyncTask<String, String, String>{
         }
         catch (Exception e)
         {
-            //Catches exceptions and displays them in the Log.
-            Log.e("Exception: ", e.toString());
         }
     return null;
     }

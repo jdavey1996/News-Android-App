@@ -28,7 +28,6 @@ public class Fragment4 extends Fragment {
 
         //Gets the data sent via bundle when creating the fragment. Logs the article number sent via the bundle.
         Bundle bundle = this.getArguments();
-        String bundleArticleNum = bundle.getString("articleNum", "null");
         String bundleArticleTitle = bundle.getString("articleTitle", "null");
         String bundleArticleDesc = bundle.getString("articleDesc", "null");
 
