@@ -7,7 +7,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -40,14 +42,20 @@ public class Fragment1 extends Fragment implements GoogleApiClient.ConnectionCal
     @Override
     public void onStart() {
         super.onStart();
-        startGoogleApi();
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            //If permission is granted, run startLocation method.
+            startGoogleApi();
+        } else {
+            //Requesting permission to access device location (Only if not granted in SDK 23. Automatically granted via manifest in SDK 22 and below).
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         //If the googleApiClient is connected, stop location updates and disconnect (Save battery).
-        if (googleApiClient.isConnected())
+        if (googleApiClient != null && googleApiClient.isConnected())
         {
             stopLocationUpdates();
             googleApiClient.disconnect();
@@ -58,7 +66,7 @@ public class Fragment1 extends Fragment implements GoogleApiClient.ConnectionCal
     public void onDestroy() {
         super.onDestroy();
         //If the googleApiClient is connected, stop location updates and disconnect (Save battery).
-        if (googleApiClient.isConnected()) {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
             stopLocationUpdates();
             googleApiClient.disconnect();
         }
@@ -118,7 +126,7 @@ public class Fragment1 extends Fragment implements GoogleApiClient.ConnectionCal
                     public void onRefresh() {
                         //If permission is granted, load data. Else request permission.
                         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                            //Reload data.
+                            loadData(currentLocation);
                         }
                         else
                         {
@@ -244,12 +252,32 @@ public class Fragment1 extends Fragment implements GoogleApiClient.ConnectionCal
                     //Location has changed. Load data again.
                     currentLocation = city;
                     Toast.makeText(getContext(), "Location changed", Toast.LENGTH_SHORT).show();
+                    loadData(currentLocation);
+
                 }
             }
         }
         catch (Exception e)
         {
         }
+    }
+
+    public void loadData(String city)
+    {
+        final GetArticles getData = new GetArticles(getContext(),getActivity(),this);
+        getData.execute(city);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable()
+        {
+            @Override
+            public void run() {
+                if ( getData.getStatus() == AsyncTask.Status.RUNNING )
+                    Toast.makeText(getContext(), "Connection error. Check network an location settings.", Toast.LENGTH_SHORT).show();
+
+                getData.cancel(true);
+                sw.setRefreshing(false);
+            }
+        }, 20000 );
     }
 
 

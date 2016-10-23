@@ -91,17 +91,10 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
             }
             else
             {
-                if (articleAmount == 0)
-                {
-                    list.setAdapter(null);
-                    Toast.makeText(ctx, "No articles available for your location.", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(ctx, "Unable to load data, please check your network connection and swipe down to refresh.", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(ctx, "No articles available for your location or network error.", Toast.LENGTH_SHORT).show();
             }
 
-            //Sets refresh aniation to false.
+            //Sets refresh animation to false.
             sw.setRefreshing(false);
         }
         catch (Exception e)
