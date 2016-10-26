@@ -38,4 +38,6 @@ public class Fragment4 extends Fragment {
         desc.setText(bundleArticleDesc);
         return view;
     }
+
+
 }

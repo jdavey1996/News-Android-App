@@ -1,10 +1,13 @@
 package com.josh_davey.news_app;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -19,94 +22,162 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConstructor>>{
+public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnConstructor>{
     Context ctx;
     Activity activity;
     Fragment frag;
-    Integer articleAmount = 0;
-    public GetArticles(Context ctx, Activity activity, Fragment frag) {
+    ProgressDialog progressDialog;
+    //Integer articleAmount = 0;
+    //articleAmount = articleAmount + 1;
+
+    public GetArticles(Context ctx, Activity activity) {
         this.ctx = ctx;
         this.activity = activity;
         this.frag = frag;
     }
 
+
     @Override
-    protected ArrayList<ArticleConstructor> doInBackground(String... params) {
-        String datafilter = params[0];
-        try {
-            ArrayList<ArticleConstructor> data = new ArrayList<ArticleConstructor>();
-
-            URL url = new URL("http://josh-davey.com/news_app_data/news_articles-"+datafilter+".json");
-
-            //Gets the articles array stored within the downloaded json object.
-            JSONArray array = returnJson(url).getJSONArray("articles");
-
-            //Loops through al objects within the articles array, adding them to an articles object, then the an ArrayList to be returned to the onPostExecute method.
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject temp = array.getJSONObject(i);
-                ArticleConstructor obj = new ArticleConstructor(temp.getString("number").toString(),temp.getString("title").toString(),temp.getString("desc").toString());
-                data.add(obj);
-                //Add one to variable containing amount of articles.
-                articleAmount = articleAmount + 1;
+    protected void onPreExecute() {
+        super.onPreExecute();
+        //Initialises the progress dialog to use the correct styles. This is then set in the onProgressUpdate method.
+        progressDialog = new ProgressDialog(ctx, R.style.AppTheme_Dark_Dialog);
+        //Adds circle spinner, and non measurable progress.
+        progressDialog.setIndeterminate(true);
+        //Prevent being cancelled by touching outside of dialog or by back button.
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setCancelable(false);
+        //Adds cancel button.
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Dismisses dialog
+                dialog.dismiss();
+                //Cancels async task
+                cancel(true);
             }
-            Thread.sleep(2000);
-            return data;
+        });
+    }
+
+    @Override
+    protected ReturnConstructor doInBackground(String... params) {
+        String dataFilter = params[0];
+        String locationFilter = params[0];
+        try {
+            URL locationUrl = new URL("http://josh-davey.com/news_app_data/news_articles-"+locationFilter+".json");
+            URL topUrl = new URL("http://josh-davey.com/news_app_data/news_articles-most_viewed_articles.php");
+            URL allUrl  = new URL("http://josh-davey.com/news_app_data/news_articles-All.json");
+            publishProgress("load");
+
+            Thread.sleep(3000);
+            switch (dataFilter)
+            {
+                case "loadall":
+                try {
+                    JSONArray all_array = new JSONObject(returnJson(allUrl)).getJSONArray("articles");
+                  //  JSONArray top_array = new JSONArray(returnJson(topUrl));
+                  //  JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
+
+                    ReturnConstructor returnData = new ReturnConstructor();
+                    returnData.all = getData(all_array);
+                   // returnData.top = getData(top_array);
+                   // returnData.local = getData(location_array);
+                    returnData.dataFilter = "loadall";
+
+                    return returnData;
+                }catch (Exception e)
+                {
+                    return null;
+                }
+                case "all":
+
+                    break;
+
+                case "location":
+
+                    break;
+
+                case "top":
+
+                    break;
+
+            }
+            //Thread.sleep(2000);
         }
         catch (Exception e)
         {
             return null;
         }
+        return null;
+    }
+    //Depending on the function executed, the correct progress dialog is set and displayed.
+    @Override
+    protected void onProgressUpdate(String... progress) {
+        super.onProgressUpdate(progress);
+        if (progress[0].equals("load")) {
+            progressDialog.setMessage("Downloading data...");
+        }
+        progressDialog.show();
     }
 
     @Override
-    protected void onPostExecute(ArrayList<ArticleConstructor> result) {
+    protected void onPostExecute(ReturnConstructor result) {
         try {
-            //Initialises a listview as null for use in if statements.
-            ListView list = null;
-            SwipeRefreshLayout sw = null;
+            progressDialog.dismiss();
+            if (result == null) {
+                Toast.makeText(ctx, "Some kind of error occurred.", Toast.LENGTH_SHORT).show();
+            }else {
+               switch (result.dataFilter) {
+                    case "loadall":
+                        Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
 
-            if (frag instanceof Fragment3) {
-                //Gets the list for fragment3 if the passed fragment is an instance of fragment3.
-                list = (ListView) activity.findViewById(R.id.lvAllArticles);
+                        //Get database instance and delete existing articles from table.
+                        SQLiteDB db = new SQLiteDB(ctx);
+                        db.deleteAll("all_articles");
 
-                //Gets refresh layout for fragment, containing the listview.
-                sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout3);
+                        //Add all articles downloaded
+                        for (int i = 0; i<result.all.size(); i++)
+                        {
+                            db.addArticle(result.all.get(i),"all_articles");
+                            Log.i("CHECK DOWNLOADED DATA",result.all.get(i).getArticleTitle() );
+                        }
 
-            } else if (frag instanceof Fragment1) {
-                //Gets the list for fragment1 if the passed fragment is an instance of fragment1.
-                list = (ListView) activity.findViewById(R.id.lvArticlesLocation);
+                        //Get all articles from database to test.
+                        for (int i = 0; i<db.getArticles("all_articles").size(); i++)
+                        {
+                            ArrayList<ArticleConstructor> test = db.getArticles("all_articles");
 
-                //Gets refresh layout for fragment, containing the listview.
-                sw = (SwipeRefreshLayout) frag.getView().findViewById(R.id.refreshLayout1);
+                            Log.i("CHECK SQLITE DB DATA",test.get(i).getArticleTitle() );
+                        }
+
+                        break;
+
+                    case "all":
+
+                        break;
+
+                    case "location":
+
+                        break;
+
+                    case "top":
+
+                        break;
+                }
             }
-
-            //If the returned result isn't null (data has been downloaded), it sets the data to the listview via the adapter.
-            //If not, the correct error message is displayed. Either no articles available, or unable to load data.
-            if(result != null) {
-                //Creates an instance of the arrayadapter, passing the returned results.
-                final ListAdapter adapter = new ArticleArrayAdapter(activity, ctx, result);
-
-                //Sets the adapter to the listview.
-                list.setAdapter(adapter);
-            }
-            else
-            {
-                Toast.makeText(ctx, "No articles available for your location or network error.", Toast.LENGTH_SHORT).show();
-            }
-
-            //Sets refresh animation to false.
-            sw.setRefreshing(false);
         }
         catch (Exception e)
         {
         }
     }
 
-    private JSONObject returnJson(URL url) {
+    private String returnJson(URL url) {
         try {
             //Sets the connection.
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
+            con.setConnectTimeout(40000);
+            con.setReadTimeout(40000);
 
             //Gets response from the server. Reads inputstream and builds a string response.
             InputStream iStream = con.getInputStream();
@@ -120,13 +191,39 @@ public class GetArticles extends AsyncTask<String, String,ArrayList<ArticleConst
             reader.close();
             iStream.close();
 
-            //Convert reader response to a JSON object.
-            JSONObject data = new JSONObject(response.toString());
-
-            //Returns JSON object containing the data.
-            return data;
+            //Returns data.
+            return response.toString();
         } catch (Exception e) {
+            return null;
         }
-        return null;
+    }
+
+
+
+    public ArrayList<ArticleConstructor> getData(JSONArray array)
+    {
+        try {
+            ArrayList<ArticleConstructor> data = new ArrayList<ArticleConstructor>();
+
+            //Loops through al objects within the articles array, adding them to an articles object, then the an ArrayList to be returned to the onPostExecute method.
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject temp = array.getJSONObject(i);
+                ArticleConstructor obj = new ArticleConstructor(temp.getString("number").toString(), temp.getString("title").toString(), temp.getString("desc").toString());
+                data.add(obj);
+            }
+            return data;
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    class ReturnConstructor
+    {
+        public String dataFilter;
+        public ArrayList<ArticleConstructor> all = new ArrayList<ArticleConstructor>();
+        public ArrayList<ArticleConstructor> local = new ArrayList<ArticleConstructor>();
+        public ArrayList<ArticleConstructor> top = new ArrayList<ArticleConstructor>();
     }
 }

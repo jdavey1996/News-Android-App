@@ -1,15 +1,27 @@
 package com.josh_davey.news_app;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    LocationUpdates loc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
                 closeFrag4(null);
             }
         });
-
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Local"));
@@ -59,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     public void closeFrag4(View view)
     {
         //Makes the frame invisible containing fragment 4.
@@ -72,5 +82,103 @@ public class MainActivity extends AppCompatActivity {
 
         //Makes the action bar close button invisible when closing fragment 4.
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Handler thread to manage location updates continuously. **Required due to frame skipping if timeout occurred in slow connection downloading data via async.
+         HandlerThread handlerThread = new HandlerThread("locationThread");
+         handlerThread.start();
+         Looper looper = handlerThread.getLooper();
+
+         loc = new LocationUpdates(this,this,looper);
+
+        //If airplane mode is on, show alert. Requires the user to press ok followed by closure of the app.
+        if (loc.isAirplaneModeOn())
+        {
+            AlertDialog.Builder airplaneModeDialog = new AlertDialog.Builder(this);
+            airplaneModeDialog.setTitle("News-App");
+            airplaneModeDialog.setMessage("This app requires internet, please turn off airplane mode. This app will now close.");
+            airplaneModeDialog.setCancelable(false);
+            airplaneModeDialog.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                });
+            airplaneModeDialog.show();
+        }
+        else
+        {
+            //Start location updates
+            loc.initiateLocationServices();
+            //Even though location updates are initiated ready, notify the user that they need to enable location services to get local data (if not already).
+            if (!loc.isLocationEnabled())
+            {
+               // Toast.makeText(this, "Enable location services to get local news, then refresh.", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder locationServicesDialog = new AlertDialog.Builder(this);
+                locationServicesDialog.setCancelable(false);
+                locationServicesDialog.setTitle("Enable Location");
+                locationServicesDialog.setMessage("Please enable location services");
+                locationServicesDialog.setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(
+                                new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                });
+                locationServicesDialog.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alert = locationServicesDialog.create();
+                alert.show();
+            }
+
+            GetArticles getData = new GetArticles(this,this);
+            getData.execute("loadall","Lincoln");
+        }
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //Stop location updates
+
+        loc.stopLocationUpdates();
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //Stop location updates
+
+        loc.stopLocationUpdates();
+    }
+
+    //Runs when the user responds to permission requests.
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode)
+        {
+            //Tasks to execute depending on the response from a request to access location data.
+            case 1:
+                //If the user grants the location permission, start google api.
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                    //Startlocation updates
+                    loc.initiateLocationServices();
+                }
+                else
+                {
+                    //If permission is not granted, error message is displayed.
+                    Toast.makeText(this, "Location permissions are disabled. Please enable to view by location.", Toast.LENGTH_SHORT).show();;
+                }
+        }
     }
 }
