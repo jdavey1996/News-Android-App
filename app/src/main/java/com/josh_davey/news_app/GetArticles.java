@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -70,25 +71,29 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
             publishProgress("load");
 
             Thread.sleep(3000);
-            switch (dataFilter)
-            {
+            switch (dataFilter) {
                 case "loadall":
-                try {
-                    JSONArray all_array = new JSONObject(returnJson(allUrl)).getJSONArray("articles");
-                  //  JSONArray top_array = new JSONArray(returnJson(topUrl));
-                  //  JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
+                    try {
+                        JSONArray all_array = new JSONObject(returnJson(allUrl)).getJSONArray("articles");
+                        //JSONArray top_array = new JSONArray(returnJson(topUrl));
 
-                    ReturnConstructor returnData = new ReturnConstructor();
-                    returnData.all = getData(all_array);
-                   // returnData.top = getData(top_array);
-                   // returnData.local = getData(location_array);
-                    returnData.dataFilter = "loadall";
+                        //JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
 
-                    return returnData;
-                }catch (Exception e)
-                {
-                    return null;
-                }
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.all = getData(all_array);
+
+                        // returnData.top = getData(top_array);
+                        // returnData.local = getData(location_array);
+                        returnData.dataFilter = "loadall";
+                        returnData.error = false;
+                        return returnData;
+
+                    } catch (Exception e) {
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "loadall";
+                        returnData.error = true;
+                        return returnData;
+                    }
                 case "all":
 
                     break;
@@ -102,7 +107,6 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                     break;
 
             }
-            //Thread.sleep(2000);
         }
         catch (Exception e)
         {
@@ -124,8 +128,30 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
     protected void onPostExecute(ReturnConstructor result) {
         try {
             progressDialog.dismiss();
-            if (result == null) {
-                Toast.makeText(ctx, "Some kind of error occurred.", Toast.LENGTH_SHORT).show();
+            TextView emptyView1 = (TextView)activity.findViewById(R.id.emptyView1);
+            TextView emptyView2 = (TextView)activity.findViewById(R.id.emptyView2);
+            TextView emptyView3 = (TextView)activity.findViewById(R.id.emptyView3);
+
+            if (result.error == true) {
+                Toast.makeText(ctx, "Failure downloading. You're now viewing historic data.", Toast.LENGTH_SHORT).show();
+                SQLiteDB db = new SQLiteDB(ctx);
+                switch (result.dataFilter){
+                    case "loadall":
+                        //setListView for other two
+                        setListView(activity,ctx,db.getArticles("all_articles"),(ListView) activity.findViewById(R.id.lvAllArticles),emptyView3);
+                        break;
+                    case "all":
+
+                        break;
+
+                    case "location":
+
+                        break;
+
+                    case "top":
+
+                        break;
+                }
             }else {
                switch (result.dataFilter) {
                     case "loadall":
@@ -142,13 +168,8 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                             Log.i("CHECK DOWNLOADED DATA",result.all.get(i).getArticleTitle() );
                         }
 
-                        //Get all articles from database to test.
-                        for (int i = 0; i<db.getArticles("all_articles").size(); i++)
-                        {
-                            ArrayList<ArticleConstructor> test = db.getArticles("all_articles");
-
-                            Log.i("CHECK SQLITE DB DATA",test.get(i).getArticleTitle() );
-                        }
+                        //
+                        setListView(activity,ctx,db.getArticles("all_articles"),(ListView) activity.findViewById(R.id.lvAllArticles),emptyView3);
 
                         break;
 
@@ -176,8 +197,8 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
             //Sets the connection.
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setConnectTimeout(40000);
-            con.setReadTimeout(40000);
+            con.setConnectTimeout(30000);
+            con.setReadTimeout(30000);
 
             //Gets response from the server. Reads inputstream and builds a string response.
             InputStream iStream = con.getInputStream();
@@ -219,11 +240,22 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
         }
     }
 
+
+
+    public void setListView(Activity activity, Context ctx, ArrayList<ArticleConstructor> list, ListView lv, TextView empty)
+    {
+        ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, list);
+        ListView listView = lv;
+        listView.setAdapter(adapter);
+        listView.setEmptyView(empty);
+    }
+
     class ReturnConstructor
     {
         public String dataFilter;
         public ArrayList<ArticleConstructor> all = new ArrayList<ArticleConstructor>();
         public ArrayList<ArticleConstructor> local = new ArrayList<ArticleConstructor>();
         public ArrayList<ArticleConstructor> top = new ArrayList<ArticleConstructor>();
+        public boolean error;
     }
 }
