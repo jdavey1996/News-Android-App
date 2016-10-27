@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
 
 public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnConstructor>{
     Context ctx;
@@ -63,10 +64,10 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
     @Override
     protected ReturnConstructor doInBackground(String... params) {
         String dataFilter = params[0];
-        String locationFilter = params[0];
+        String locationFilter = "Lincoln";
         try {
             URL locationUrl = new URL("http://josh-davey.com/news_app_data/news_articles-"+locationFilter+".json");
-            URL topUrl = new URL("http://josh-davey.com/news_app_data/news_articles-most_viewed_articles.php");
+            URL topUrl = new URL("http://josh-davey.com/news_app_data/news_articles-top_articles.php");
             URL allUrl  = new URL("http://josh-davey.com/news_app_data/news_articles-All.json");
             publishProgress("load");
 
@@ -74,17 +75,23 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
             switch (dataFilter) {
                 case "loadall":
                     try {
-                        JSONArray all_array = new JSONObject(returnJson(allUrl)).getJSONArray("articles");
-                        //JSONArray top_array = new JSONArray(returnJson(topUrl));
-
-                        //JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
-
                         ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "loadall";
+
+                        JSONArray all_array = new JSONObject(returnJson(allUrl)).getJSONArray("articles");
                         returnData.all = getData(all_array);
 
-                        // returnData.top = getData(top_array);
-                        // returnData.local = getData(location_array);
-                        returnData.dataFilter = "loadall";
+                        JSONArray top_array = new JSONArray(returnJson(topUrl));
+                        returnData.top = getData(top_array);
+
+                       try {
+                            JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
+                            returnData.local = getData(location_array);
+                        }catch (Exception e)
+                        {
+                            returnData.local = null;
+                        }
+
                         returnData.error = false;
                         return returnData;
 
@@ -133,11 +140,13 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
             TextView emptyView3 = (TextView)activity.findViewById(R.id.emptyView3);
 
             if (result.error == true) {
-                Toast.makeText(ctx, "Failure downloading. You're now viewing historic data.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Connection error. You're now viewing historic data.", Toast.LENGTH_SHORT).show();
                 SQLiteDB db = new SQLiteDB(ctx);
                 switch (result.dataFilter){
                     case "loadall":
-                        //setListView for other two
+                        //If error occurs, load old data.
+                        setListView(activity,ctx,db.getArticles("local_articles"),(ListView) activity.findViewById(R.id.lvLocationArticles),emptyView1);
+                        setListView(activity,ctx,db.getArticles("top_articles"),(ListView) activity.findViewById(R.id.lvTopArticles),emptyView2);
                         setListView(activity,ctx,db.getArticles("all_articles"),(ListView) activity.findViewById(R.id.lvAllArticles),emptyView3);
                         break;
                     case "all":
@@ -153,23 +162,43 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                         break;
                 }
             }else {
-               switch (result.dataFilter) {
+                switch (result.dataFilter) {
                     case "loadall":
-                        Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
-
-                        //Get database instance and delete existing articles from table.
                         SQLiteDB db = new SQLiteDB(ctx);
-                        db.deleteAll("all_articles");
-
+                        Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
+                        //TOP
+                        //Delete existing articles from table.
+                        db.deleteAll("top_articles");
                         //Add all articles downloaded
-                        for (int i = 0; i<result.all.size(); i++)
-                        {
-                            db.addArticle(result.all.get(i),"all_articles");
-                            Log.i("CHECK DOWNLOADED DATA",result.all.get(i).getArticleTitle() );
+                        for (int i = 0; i < result.top.size(); i++) {
+                            db.addArticle(result.top.get(i), "top_articles");
                         }
+                        setListView(activity, ctx, db.getArticles("top_articles"), (ListView) activity.findViewById(R.id.lvTopArticles), emptyView2);
 
-                        //
-                        setListView(activity,ctx,db.getArticles("all_articles"),(ListView) activity.findViewById(R.id.lvAllArticles),emptyView3);
+                        //ALL
+                        //Delete existing articles from table.
+                        db.deleteAll("all_articles");
+                        //Add all articles downloaded
+                        for (int i = 0; i < result.all.size(); i++) {
+                                db.addArticle(result.all.get(i), "all_articles");
+                            }
+                        setListView(activity, ctx, db.getArticles("all_articles"), (ListView) activity.findViewById(R.id.lvAllArticles), emptyView3);
+
+
+                        //LOCATION
+                        if (result.local == null)
+                        {
+                            emptyView1.setText("Location data is not available at this time. There may be no articles in your location.");
+                            db.deleteAll("local_articles");
+                        }else {
+                            //Delete existing articles from table.
+                            db.deleteAll("local_articles");
+                            //Add all articles downloaded.
+                            for (int i = 0; i < result.local.size(); i++) {
+                                db.addArticle(result.local.get(i), "local_articles");
+                            }
+                        }
+                        setListView(activity, ctx, db.getArticles("local_articles"), (ListView) activity.findViewById(R.id.lvLocationArticles),emptyView1);
 
                         break;
 
@@ -191,6 +220,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
         {
         }
     }
+
 
     private String returnJson(URL url) {
         try {
@@ -239,8 +269,6 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
             return null;
         }
     }
-
-
 
     public void setListView(Activity activity, Context ctx, ArrayList<ArticleConstructor> list, ListView lv, TextView empty)
     {

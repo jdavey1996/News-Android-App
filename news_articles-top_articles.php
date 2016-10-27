@@ -15,7 +15,7 @@
 	}
 
 
-	$str = file_get_contents('http://josh-davey.com/news_app_data/news_articles-all.json');
+	$str = file_get_contents('http://josh-davey.com/news_app_data/news_articles-All.json');
 
 	$json = json_decode($str, true);
 	

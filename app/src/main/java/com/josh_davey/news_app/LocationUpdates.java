@@ -169,7 +169,7 @@ public class LocationUpdates implements GoogleApiClient.ConnectionCallbacks, Goo
                 if (city.equals(currentLocation))
                 {
                     //No location change.
-                    Toast.makeText(activity, "No location change", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(activity, "No location change", Toast.LENGTH_SHORT).show();
                 }
                 else if (city.equals("null"))
                 {
