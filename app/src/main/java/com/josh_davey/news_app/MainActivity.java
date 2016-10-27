@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewDebug;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -153,5 +154,20 @@ public class MainActivity extends AppCompatActivity {
         //Load data.
         GetArticles getData = new GetArticles(this, this);
         getData.execute("loadall", currentLocation);
+    }
+
+    @Override
+    public void onBackPressed() {
+        //If frame layout containing fragment 4 is visible, back pressed runs the closeFrag4 method, making it invisible again.
+        FrameLayout frame = (FrameLayout)findViewById(R.id.framefrag);
+        if(frame.getVisibility() == View.VISIBLE)
+        {
+            closeFrag4(null);
+        }
+        //Else back pressed runs as normal.
+        else
+        {
+            super.onBackPressed();
+        }
     }
 }

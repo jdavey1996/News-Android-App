@@ -11,6 +11,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 public class Fragment2 extends Fragment {
+    public Fragment2()
+    {
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -19,6 +23,7 @@ public class Fragment2 extends Fragment {
         View view = inflater.inflate(R.layout.fragment2, container, false);
         return view;
     }
+
     @Override
     public void onStart() {
         super.onStart();
