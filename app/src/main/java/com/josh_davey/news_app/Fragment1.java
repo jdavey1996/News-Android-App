@@ -2,6 +2,7 @@ package com.josh_davey.news_app;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -54,8 +55,12 @@ public class Fragment1 extends Fragment{
         sw1.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                //Get current location from shared preferences. If not stored, value is null.
+                SharedPreferences prefs = getContext().getSharedPreferences("News-App-Location", getContext().MODE_PRIVATE);
+                String currentLocation = prefs.getString("currentLocation", null);
+
                 GetArticles getData = new GetArticles(getContext(),getActivity());
-                getData.execute("location","Not");
+                getData.execute("location",currentLocation);
                 sw1.setRefreshing(false);
             }
         });

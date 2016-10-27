@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -145,7 +146,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void downloadData()
     {
+        //Get current location from shared preferences. If not stored, value is null.
+        SharedPreferences prefs = getSharedPreferences("News-App-Location", MODE_PRIVATE);
+        String currentLocation = prefs.getString("currentLocation", null);
+
+        //Load data.
         GetArticles getData = new GetArticles(this, this);
-        getData.execute("loadall", "Lincoln");
+        getData.execute("loadall", currentLocation);
     }
 }

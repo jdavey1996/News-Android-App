@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -169,19 +170,18 @@ public class LocationUpdates implements GoogleApiClient.ConnectionCallbacks, Goo
                 if (city.equals(currentLocation))
                 {
                     //No location change.
-                    //Toast.makeText(activity, "No location change", Toast.LENGTH_SHORT).show();
                 }
                 else if (city.equals("null"))
                 {
                     //No city data.
-                    Toast.makeText(activity, "No city data", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-                    //Location has changed. Load data again.
+                    //Location has changed. Update shared preferences.
                     currentLocation = city;
-                    Toast.makeText(activity, currentLocation, Toast.LENGTH_SHORT).show();
-                    //loadData(currentLocation);
+                    SharedPreferences.Editor editor = ctx.getSharedPreferences("News-App-Location", ctx.MODE_PRIVATE).edit();
+                    editor.putString("currentLocation",currentLocation);
+                    editor.commit();
                 }
             }
         }

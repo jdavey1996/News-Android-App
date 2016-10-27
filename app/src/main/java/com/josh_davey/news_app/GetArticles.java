@@ -190,16 +190,16 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
     protected void onProgressUpdate(String... progress) {
         super.onProgressUpdate(progress);
         if (progress[0].equals("loadall")) {
-            progressDialog.setMessage("Attempting to download all tab data...");
+            progressDialog.setMessage("Attempting to download all app data...");
         }
         else if(progress[0].equals("all")) {
-            progressDialog.setMessage("Attempting to download all articles tab data...");
+            progressDialog.setMessage("Attempting to download data for tab 'ALL'...");
         }
         else if (progress[0].equals("top")) {
-            progressDialog.setMessage("Attempting to download top articles tab data...");
+            progressDialog.setMessage("Attempting to download data for tab 'MOST VIEWED'...");
         }
         else if (progress[0].equals("location")) {
-            progressDialog.setMessage("Attempting to download location articles data...");
+            progressDialog.setMessage("Attempting to download data for tab 'LOCAL'...");
         }
         progressDialog.show();
     }
