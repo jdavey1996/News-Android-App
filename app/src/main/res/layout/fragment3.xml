@@ -21,9 +21,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="NO DATA "
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="NO DATA"
         android:id="@+id/emptyView3"
-        android:layout_gravity="left|top" />
+        android:layout_gravity="left|top"
+        android:visibility="invisible" />
 
 </FrameLayout>

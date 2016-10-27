@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,20 +20,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.concurrent.Executor;
 
 public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnConstructor>{
     Context ctx;
     Activity activity;
     Fragment frag;
     ProgressDialog progressDialog;
-    //Integer articleAmount = 0;
-    //articleAmount = articleAmount + 1;
 
     public GetArticles(Context ctx, Activity activity) {
         this.ctx = ctx;
         this.activity = activity;
-        this.frag = frag;
     }
 
 
@@ -64,32 +58,42 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
     @Override
     protected ReturnConstructor doInBackground(String... params) {
         String dataFilter = params[0];
-        String locationFilter = "Lincoln";
+        String locationFilter = params[1];
         try {
             URL locationUrl = new URL("http://josh-davey.com/news_app_data/news_articles-"+locationFilter+".json");
             URL topUrl = new URL("http://josh-davey.com/news_app_data/news_articles-top_articles.php");
             URL allUrl  = new URL("http://josh-davey.com/news_app_data/news_articles-All.json");
-            publishProgress("load");
 
-            Thread.sleep(3000);
             switch (dataFilter) {
                 case "loadall":
                     try {
+                        publishProgress("loadall");
+                        Thread.sleep(3000);
+
                         ReturnConstructor returnData = new ReturnConstructor();
                         returnData.dataFilter = "loadall";
 
+                        //Get all articles data.
                         JSONArray all_array = new JSONObject(returnJson(allUrl)).getJSONArray("articles");
-                        returnData.all = getData(all_array);
+                        returnData.all = extractData(all_array);
 
+                        //Get top articles data.
                         JSONArray top_array = new JSONArray(returnJson(topUrl));
-                        returnData.top = getData(top_array);
+                        returnData.top = extractData(top_array);
 
-                       try {
-                            JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
-                            returnData.local = getData(location_array);
-                        }catch (Exception e)
+                        //Check if a JSON file at 'locationUrl' exists
+                        Boolean check = checkDataFileExists(locationUrl);
+                        //If it exists, get data and add to return variable.
+                        if (check==true)
                         {
+                            //Get local articles data.
+                            JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
+                            returnData.local = extractData(location_array);
+                        }
+                        //If doesn't exist, add null to return variable and add location filter - to check later whether location is null or just a city that's unknown.
+                        else if (check ==false){
                             returnData.local = null;
+                            returnData.location = locationFilter;
                         }
 
                         returnData.error = false;
@@ -102,17 +106,77 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                         return returnData;
                     }
                 case "all":
+                    try {
+                        publishProgress("all");
+                        Thread.sleep(3000);
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "all";
 
-                    break;
+                        //Get all articles data.
+                        JSONArray all_array = new JSONObject(returnJson(allUrl)).getJSONArray("articles");
+                        returnData.all = extractData(all_array);
 
-                case "location":
-
-                    break;
+                        returnData.error = false;
+                        return returnData;
+                    }catch (Exception e)
+                    {
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "all";
+                        returnData.error = true;
+                        return returnData;
+                    }
 
                 case "top":
+                    try {
+                        publishProgress("top");
+                        Thread.sleep(3000);
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "top";
 
-                    break;
+                        //Get top articles data.
+                        JSONArray top_array = new JSONArray(returnJson(topUrl));
+                        returnData.top = extractData(top_array);
 
+                        returnData.error = false;
+                        return returnData;
+                    }catch (Exception e)
+                    {
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "top";
+                        returnData.error = true;
+                        return returnData;
+                    }
+
+                case "location":
+                    try {
+                        publishProgress("location");
+                        Thread.sleep(3000);
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "location";
+
+                        //Check if a JSON file at 'locationUrl' exists
+                        Boolean check = checkDataFileExists(locationUrl);
+                        //If it exists, get data and add to return variable.
+                        if (check==true)
+                        {
+                            //Get local articles data.
+                            JSONArray location_array = new JSONObject(returnJson(locationUrl)).getJSONArray("articles");
+                            returnData.local = extractData(location_array);
+                        }
+                        //If doesn't exist, add null to return variable.
+                        else if (check == false){
+                            returnData.local = null;
+                            returnData.location = locationFilter;
+                        }
+                        returnData.error = false;
+                        return returnData;
+                    }catch (Exception e)
+                    {
+                        ReturnConstructor returnData = new ReturnConstructor();
+                        returnData.dataFilter = "location";
+                        returnData.error = true;
+                        return returnData;
+                    }
             }
         }
         catch (Exception e)
@@ -125,8 +189,17 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
     @Override
     protected void onProgressUpdate(String... progress) {
         super.onProgressUpdate(progress);
-        if (progress[0].equals("load")) {
-            progressDialog.setMessage("Downloading data...");
+        if (progress[0].equals("loadall")) {
+            progressDialog.setMessage("Attempting to download all tab data...");
+        }
+        else if(progress[0].equals("all")) {
+            progressDialog.setMessage("Attempting to download all articles tab data...");
+        }
+        else if (progress[0].equals("top")) {
+            progressDialog.setMessage("Attempting to download top articles tab data...");
+        }
+        else if (progress[0].equals("location")) {
+            progressDialog.setMessage("Attempting to download location articles data...");
         }
         progressDialog.show();
     }
@@ -135,47 +208,37 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
     protected void onPostExecute(ReturnConstructor result) {
         try {
             progressDialog.dismiss();
+            //Initiate SQLite database instance.
+            SQLiteDB db = new SQLiteDB(ctx);
+            //Initiate textviews for displaying text when listviews are empty.
             TextView emptyView1 = (TextView)activity.findViewById(R.id.emptyView1);
             TextView emptyView2 = (TextView)activity.findViewById(R.id.emptyView2);
             TextView emptyView3 = (TextView)activity.findViewById(R.id.emptyView3);
 
             if (result.error == true) {
-                Toast.makeText(ctx, "Connection error. You're now viewing historic data.", Toast.LENGTH_SHORT).show();
-                SQLiteDB db = new SQLiteDB(ctx);
+                Toast.makeText(ctx, "Connection error, unable to update data - You're viewing old data.", Toast.LENGTH_SHORT).show();
                 switch (result.dataFilter){
+                    //If error occurs, load old data.
                     case "loadall":
-                        //If error occurs, load old data.
                         setListView(activity,ctx,db.getArticles("local_articles"),(ListView) activity.findViewById(R.id.lvLocationArticles),emptyView1);
                         setListView(activity,ctx,db.getArticles("top_articles"),(ListView) activity.findViewById(R.id.lvTopArticles),emptyView2);
                         setListView(activity,ctx,db.getArticles("all_articles"),(ListView) activity.findViewById(R.id.lvAllArticles),emptyView3);
                         break;
                     case "all":
-
+                        setListView(activity,ctx,db.getArticles("all_articles"),(ListView) activity.findViewById(R.id.lvAllArticles),emptyView3);
                         break;
-
                     case "location":
-
+                        setListView(activity,ctx,db.getArticles("local_articles"),(ListView) activity.findViewById(R.id.lvLocationArticles),emptyView1);
                         break;
-
                     case "top":
-
+                        setListView(activity,ctx,db.getArticles("top_articles"),(ListView) activity.findViewById(R.id.lvTopArticles),emptyView2);
                         break;
                 }
             }else {
+                Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
                 switch (result.dataFilter) {
                     case "loadall":
-                        SQLiteDB db = new SQLiteDB(ctx);
-                        Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
-                        //TOP
-                        //Delete existing articles from table.
-                        db.deleteAll("top_articles");
-                        //Add all articles downloaded
-                        for (int i = 0; i < result.top.size(); i++) {
-                            db.addArticle(result.top.get(i), "top_articles");
-                        }
-                        setListView(activity, ctx, db.getArticles("top_articles"), (ListView) activity.findViewById(R.id.lvTopArticles), emptyView2);
-
-                        //ALL
+                        //ALL ARTICLES
                         //Delete existing articles from table.
                         db.deleteAll("all_articles");
                         //Add all articles downloaded
@@ -184,34 +247,87 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                             }
                         setListView(activity, ctx, db.getArticles("all_articles"), (ListView) activity.findViewById(R.id.lvAllArticles), emptyView3);
 
+                        //TOP ARTICLES
+                        //Delete existing articles from table.
+                        db.deleteAll("top_articles");
+                        //Add all articles downloaded
+                        for (int i = 0; i < result.top.size(); i++) {
+                            db.addArticle(result.top.get(i), "top_articles");
+                        }
+                        setListView(activity, ctx, db.getArticles("top_articles"), (ListView) activity.findViewById(R.id.lvTopArticles), emptyView2);
 
-                        //LOCATION
+                        //LOCATION ARTICLES
+                        //Delete existing articles from table.
+                        db.deleteAll("local_articles");
+                        //If null is returned (no url exists for current location), set empty view text.
                         if (result.local == null)
                         {
-                            emptyView1.setText("Location data is not available at this time. There may be no articles in your location.");
-                            db.deleteAll("local_articles");
-                        }else {
-                            //Delete existing articles from table.
-                            db.deleteAll("local_articles");
+                            if(result.location == null)
+                            {
+                                emptyView1.setText("Unable to acquire your location, please try again later.");
+                            }
+                            else {
+                                emptyView1.setText("No articles available for your location");
+                            }
+                        }
+                        else {
                             //Add all articles downloaded.
                             for (int i = 0; i < result.local.size(); i++) {
                                 db.addArticle(result.local.get(i), "local_articles");
                             }
                         }
-                        setListView(activity, ctx, db.getArticles("local_articles"), (ListView) activity.findViewById(R.id.lvLocationArticles),emptyView1);
+                        //Set data from db to listview. Sets no data to listview if null is returned above as db.delete is ran previously.
+                        setListView(activity, ctx, db.getArticles("local_articles"), (ListView) activity.findViewById(R.id.lvLocationArticles), emptyView1);
 
                         break;
 
                     case "all":
-
-                        break;
-
-                    case "location":
-
+                        //ALL
+                        //Delete existing articles from table.
+                        db.deleteAll("all_articles");
+                        //Add all articles downloaded
+                        for (int i = 0; i < result.all.size(); i++) {
+                            db.addArticle(result.all.get(i), "all_articles");
+                        }
+                        //Set list data.
+                        setListView(activity, ctx, db.getArticles("all_articles"), (ListView) activity.findViewById(R.id.lvAllArticles), emptyView3);
                         break;
 
                     case "top":
+                        //TOP
+                        //Delete existing articles from table.
+                        db.deleteAll("top_articles");
+                        //Add all articles downloaded
+                        for (int i = 0; i < result.top.size(); i++) {
+                            db.addArticle(result.top.get(i), "top_articles");
+                        }
+                        //Set list data.
+                        setListView(activity, ctx, db.getArticles("top_articles"), (ListView) activity.findViewById(R.id.lvTopArticles), emptyView2);
+                        break;
 
+                    case "location":
+                        //LOCATION
+                        //Delete existing articles from table.
+                        db.deleteAll("local_articles");
+                        //If null is returned (no url exists for current location), set empty view text.
+                        if (result.local == null)
+                        {
+                            if(result.location == null)
+                            {
+                                emptyView1.setText("Unable to acquire your location, please try again later.");
+                            }
+                            else {
+                                emptyView1.setText("No articles available for your location");
+                            }
+                        }
+                        else {
+                            //Add all articles downloaded.
+                            for (int i = 0; i < result.local.size(); i++) {
+                                db.addArticle(result.local.get(i), "local_articles");
+                            }
+                        }
+                        //Set data from db to listview. Sets no data to listview if null is returned above as db.delete is ran previously.
+                        setListView(activity, ctx, db.getArticles("local_articles"), (ListView) activity.findViewById(R.id.lvLocationArticles), emptyView1);
                         break;
                 }
             }
@@ -222,6 +338,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
     }
 
 
+    //Method to download data from URL.
     private String returnJson(URL url) {
         try {
             //Sets the connection.
@@ -249,9 +366,8 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
         }
     }
 
-
-
-    public ArrayList<ArticleConstructor> getData(JSONArray array)
+    //Method to extract data from JSON array into an ArticleConstructor constructed ArrayList.
+    public ArrayList<ArticleConstructor> extractData(JSONArray array)
     {
         try {
             ArrayList<ArticleConstructor> data = new ArrayList<ArticleConstructor>();
@@ -270,6 +386,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
         }
     }
 
+    //Method to set listview data.
     public void setListView(Activity activity, Context ctx, ArrayList<ArticleConstructor> list, ListView lv, TextView empty)
     {
         ListAdapter adapter = new ArticleArrayAdapter(activity,ctx, list);
@@ -278,6 +395,23 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
         listView.setEmptyView(empty);
     }
 
+    //Method to check if JSON file exists at URL. If true, return true. If false, return false. If exception occurs (no internet con), throw exception back to calling method.
+    public boolean checkDataFileExists(URL url) {
+        try {
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("HEAD");
+            con.setConnectTimeout(10000);
+            con.setReadTimeout(10000);
+            if ((con.getResponseCode() == HttpURLConnection.HTTP_OK))
+                return true;
+            else
+                return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to check network if exists, network error");
+        }
+    }
+
+
     class ReturnConstructor
     {
         public String dataFilter;
@@ -285,5 +419,6 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
         public ArrayList<ArticleConstructor> local = new ArrayList<ArticleConstructor>();
         public ArrayList<ArticleConstructor> top = new ArrayList<ArticleConstructor>();
         public boolean error;
+        public String location;
     }
 }

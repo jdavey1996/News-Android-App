@@ -45,22 +45,19 @@ public class Fragment1 extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment1, container, false);
-
         return view;
     }
     @Override
     public void onStart() {
         super.onStart();
+        final SwipeRefreshLayout sw1 = (SwipeRefreshLayout)getActivity().findViewById(R.id.refreshLayout1);
+        sw1.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                GetArticles getData = new GetArticles(getContext(),getActivity());
+                getData.execute("location","Not");
+                sw1.setRefreshing(false);
+            }
+        });
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
 }

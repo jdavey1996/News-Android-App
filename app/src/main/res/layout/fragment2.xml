@@ -10,7 +10,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/refreshLayout2">7
+        android:id="@+id/refreshLayout2">
 
         <ListView
             android:layout_width="match_parent"
@@ -22,9 +22,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="NO DATA "
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="NO DATA"
         android:id="@+id/emptyView2"
-        android:layout_gravity="left|top" />
+        android:layout_gravity="left|top"
+        android:visibility="invisible" />
 
 </FrameLayout>

@@ -89,75 +89,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         //Handler thread to manage location updates continuously. **Required due to frame skipping if timeout occurred in slow connection downloading data via async.
-         HandlerThread handlerThread = new HandlerThread("locationThread");
-         handlerThread.start();
-         Looper looper = handlerThread.getLooper();
+        HandlerThread handlerThread = new HandlerThread("locationThread");
+        handlerThread.start();
+        Looper looper = handlerThread.getLooper();
 
-         loc = new LocationUpdates(this,this,looper);
+        //Initialise location updates class using the looper.
+        loc = new LocationUpdates(this,this,looper);
 
-        //If airplane mode is on, show alert. Requires the user to press ok followed by closure of the app.
-        if (loc.isAirplaneModeOn())
-        {
-            AlertDialog.Builder airplaneModeDialog = new AlertDialog.Builder(this);
-            airplaneModeDialog.setTitle("News-App");
-            airplaneModeDialog.setMessage("This app requires internet, please turn off airplane mode. This app will now close.");
-            airplaneModeDialog.setCancelable(false);
-            airplaneModeDialog.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                    }
-                });
-            airplaneModeDialog.show();
+        //Start location updates
+        loc.initiateLocationServices();
+
+        //If location permissions are already enabled, begin downloading data. If they're not, load later when ANY response is given to location permissions request.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            downloadData();
         }
-        else
-        {
-            //Start location updates
-            loc.initiateLocationServices();
-            //Even though location updates are initiated ready, notify the user that they need to enable location services to get local data (if not already).
-            if (!loc.isLocationEnabled())
-            {
-               // Toast.makeText(this, "Enable location services to get local news, then refresh.", Toast.LENGTH_SHORT).show();
-                AlertDialog.Builder locationServicesDialog = new AlertDialog.Builder(this);
-                locationServicesDialog.setCancelable(false);
-                locationServicesDialog.setTitle("Enable Location");
-                locationServicesDialog.setMessage("Please enable location services");
-                locationServicesDialog.setPositiveButton("Enable", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(
-                                new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                });
-                locationServicesDialog.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alert = locationServicesDialog.create();
-                alert.show();
-            }
-
-            GetArticles getData = new GetArticles(this,this);
-            getData.execute("loadall","Lincoln");
-        }
-
-
     }
+
 
     @Override
     protected void onPause() {
         super.onPause();
         //Stop location updates
-
         loc.stopLocationUpdates();
-
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         //Stop location updates
-
         loc.stopLocationUpdates();
     }
 
@@ -170,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 //If the user grants the location permission, start google api.
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
                     //Startlocation updates
                     loc.initiateLocationServices();
                 }
@@ -179,6 +137,15 @@ public class MainActivity extends AppCompatActivity {
                     //If permission is not granted, error message is displayed.
                     Toast.makeText(this, "Location permissions are disabled. Please enable to view by location.", Toast.LENGTH_SHORT).show();;
                 }
+
+                //Download all data once response is given.
+                downloadData();
         }
+    }
+
+    public void downloadData()
+    {
+        GetArticles getData = new GetArticles(this, this);
+        getData.execute("loadall", "Lincoln");
     }
 }
