@@ -235,9 +235,9 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                         break;
                 }
             }else {
-                Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
                 switch (result.dataFilter) {
                     case "loadall":
+                        Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
                         //ALL ARTICLES
                         //Delete existing articles from table.
                         db.deleteAll("all_articles");
@@ -262,6 +262,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                         //If null is returned (no url exists for current location), set empty view text.
                         if (result.local == null)
                         {
+                            Toast.makeText(ctx, "An location error occurred. Please see the Local tab for more info.", Toast.LENGTH_SHORT).show();
                             if(result.location == null)
                             {
                                 emptyView1.setText("Unable to acquire your location, please try again later.");
@@ -282,6 +283,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                         break;
 
                     case "all":
+                        Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
                         //ALL
                         //Delete existing articles from table.
                         db.deleteAll("all_articles");
@@ -294,6 +296,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                         break;
 
                     case "top":
+                        Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
                         //TOP
                         //Delete existing articles from table.
                         db.deleteAll("top_articles");
@@ -312,6 +315,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                         //If null is returned (no url exists for current location), set empty view text.
                         if (result.local == null)
                         {
+                            Toast.makeText(ctx, "An location error occurred. Please see the Local tab for more info.", Toast.LENGTH_SHORT).show();
                             if(result.location == null)
                             {
                                 emptyView1.setText("Unable to acquire your location, please try again later.");
@@ -321,6 +325,7 @@ public class GetArticles extends AsyncTask<String, String, GetArticles.ReturnCon
                             }
                         }
                         else {
+                            Toast.makeText(ctx, "Download successful!", Toast.LENGTH_SHORT).show();
                             //Add all articles downloaded.
                             for (int i = 0; i < result.local.size(); i++) {
                                 db.addArticle(result.local.get(i), "local_articles");
